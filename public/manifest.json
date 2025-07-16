@@ -13,6 +13,11 @@
       "sizes": "any"
     },
     {
+      "src": "vercel-icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "64x64"
+    },
+    {
       "src": "mcp-icon-192.png",
       "type": "image/png",
       "sizes": "192x192"
