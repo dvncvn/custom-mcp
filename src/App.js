@@ -374,6 +374,7 @@ function App() {
   const [isServerNameDialogOpen, setIsServerNameDialogOpen] = useState(false);
   const [selectedServer, setSelectedServer] = useState(null);
   const [showServerSidePanel, setShowServerSidePanel] = useState(false);
+  const [sidePanelWidth, setSidePanelWidth] = useState(400);
   
   // Canvas components management
   const [canvasComponents, setCanvasComponents] = useState([]);
@@ -565,7 +566,10 @@ function App() {
     
     if (!currentTab) {
       return (
-        <main className="main-content">
+        <main 
+          className={`main-content${showServerSidePanel ? ' side-panel-open' : ''}`}
+          style={{ marginRight: showServerSidePanel ? `${sidePanelWidth}px` : '0' }}
+        >
           {/* No tab selected */}
         </main>
       );
@@ -582,7 +586,11 @@ function App() {
     }
 
     return (
-      <main className="main-content" onClick={handleCanvasClick}>
+      <main 
+        className={`main-content${showServerSidePanel ? ' side-panel-open' : ''}`} 
+        style={{ marginRight: showServerSidePanel ? `${sidePanelWidth}px` : '0' }}
+        onClick={handleCanvasClick}
+      >
         <FlowCanvasControls />
         {/* Canvas components */}
         {canvasComponents.map((component) => {
@@ -660,6 +668,7 @@ function App() {
             onClose={handleCloseSidePanel}
             onEdit={handleEditServer}
             onDelete={handleDeleteServer}
+            onWidthChange={setSidePanelWidth}
           />
         )}
         <TopNav 

@@ -577,6 +577,12 @@
   min-height: 0;
   overflow-y: auto;
   position: relative;
+  transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-right: 0;
+}
+
+.main-content.side-panel-open {
+  margin-right: 400px; /* Default side panel width */
 }
 
 /* Flow Canvas Controls */

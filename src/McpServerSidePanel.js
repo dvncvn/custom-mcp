@@ -3,13 +3,20 @@ import { X, MoreHorizontal, Info, Edit, Share2, GitBranch, Zap, Trash2, AlertTri
 import './McpServerSidePanel.css';
 import AddToolsDialog from './AddToolsDialog';
 
-export default function McpServerSidePanel({ serverData, onClose, onEdit, onDelete }) {
+export default function McpServerSidePanel({ serverData, onClose, onEdit, onDelete, isOpen = true, onWidthChange }) {
   const [isRunning, setIsRunning] = useState(true);
   const [authType, setAuthType] = useState('none');
   const [showActionsMenu, setShowActionsMenu] = useState(false);
   const [showAuthDropdown, setShowAuthDropdown] = useState(false);
   const [serverName, setServerName] = useState(serverData?.name || 'Figmail');
   const [panelWidth, setPanelWidth] = useState(400);
+
+  // Notify parent of width changes
+  React.useEffect(() => {
+    if (onWidthChange) {
+      onWidthChange(panelWidth);
+    }
+  }, [panelWidth, onWidthChange]);
   const [isResizing, setIsResizing] = useState(false);
   
   // Confirmation dialog states
@@ -336,7 +343,7 @@ export default function McpServerSidePanel({ serverData, onClose, onEdit, onDele
 
     return (
     <div 
-      className="mcp-server-side-panel" 
+      className={`mcp-server-side-panel${isOpen ? ' open' : ''}`}
       ref={panelRef}
       style={{ width: panelWidth }}
     >
@@ -362,10 +369,6 @@ export default function McpServerSidePanel({ serverData, onClose, onEdit, onDele
           </div>
           {showActionsMenu && (
             <div className="actions-dropdown">
-              <div className="actions-dropdown-item" onClick={() => handleActionSelect('edit')}>
-                <Edit size={16} />
-                <span>Edit</span>
-              </div>
               <div className="actions-dropdown-item" onClick={() => handleActionSelect('connect')}>
                 <Share2 size={16} />
                 <span>Connect</span>
@@ -392,12 +395,21 @@ export default function McpServerSidePanel({ serverData, onClose, onEdit, onDele
               Server Name
               <Info size={14} className="side-panel-info-icon" />
             </label>
-            <input
-              type="text"
-              className="side-panel-input"
-              value={serverName}
-              onChange={(e) => setServerName(e.target.value)}
-            />
+            <div className="server-name-row">
+              <input
+                type="text"
+                className="side-panel-input"
+                value={serverName}
+                onChange={(e) => setServerName(e.target.value)}
+              />
+              <button 
+                className="edit-server-btn"
+                onClick={() => handleActionSelect('edit')}
+                title="Edit Server"
+              >
+                <Edit size={16} />
+              </button>
+            </div>
           </div>
 
           <div className="side-panel-section">
