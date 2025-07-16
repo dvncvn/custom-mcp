@@ -351,8 +351,9 @@
 
 .tools-list {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .tool-item {
@@ -363,4 +364,6 @@
   padding: 8px 12px;
   border-radius: 6px;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  flex-shrink: 0;
+  white-space: nowrap;
 } 
