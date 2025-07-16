@@ -32,6 +32,8 @@ import AddMcpServerDialog from './AddMcpServerDialog';
 import McpServerBuilder from './McpServerBuilder';
 import ServerNameDialog from './ServerNameDialog';
 import McpServerSidePanel from './McpServerSidePanel';
+import McpServerComponent from './McpServerComponent';
+import ContextualToolbar from './ContextualToolbar';
 
 const leftNavItems = [
   { key: 'agent', icon: <AgentIcon size={20} />, label: 'Agent' },
@@ -182,19 +184,7 @@ function ComponentsSidebar() {
   );
 }
 
-function McpServersSidebar({ onAddServer }) {
-  // Placeholder data
-  const servers = [
-    { id: 1, name: 'supabase-mcp', status: 'online', tools: 17 },
-    { id: 2, name: 'google-maps', status: 'online', tools: 8 },
-    { id: 3, name: 'mem0-memory-mcp', status: 'online', tools: 8 },
-    { id: 4, name: 'exa', status: 'online', tools: 8 },
-    { id: 5, name: 'echo-mcp', status: 'offline', tools: 3 },
-    { id: 6, name: 'github', status: 'online', tools: 18 },
-    { id: 7, name: 'my-server', status: 'online', tools: 4, type: 'custom' },
-    { id: 8, name: 'custom-server', status: 'online', tools: 7, type: 'custom' },
-    { id: 9, name: 'my-project', status: 'online', tools: 32, type: 'project' },
-  ];
+function McpServersSidebar({ onAddServer, servers }) {
   return (
     <aside className="components-sidebar mcp-servers-sidebar">
       <div className="sidebar-search-row">
@@ -385,12 +375,30 @@ function App() {
   const [selectedServer, setSelectedServer] = useState(null);
   const [showServerSidePanel, setShowServerSidePanel] = useState(false);
   
+  // Canvas components management
+  const [canvasComponents, setCanvasComponents] = useState([]);
+  const [nextComponentId, setNextComponentId] = useState(1);
+  const [selectedComponentId, setSelectedComponentId] = useState(null);
+  
+  // Available servers (existing + custom)
+  const [availableServers, setAvailableServers] = useState([
+    { id: 1, name: 'supabase-mcp', status: 'online', tools: 17 },
+    { id: 2, name: 'google-maps', status: 'online', tools: 8 },
+    { id: 3, name: 'mem0-memory-mcp', status: 'online', tools: 8 },
+    { id: 4, name: 'exa', status: 'online', tools: 8 },
+    { id: 5, name: 'echo-mcp', status: 'offline', tools: 3 },
+    { id: 6, name: 'github', status: 'online', tools: 18 },
+    { id: 7, name: 'my-server', status: 'online', tools: 4, type: 'custom' },
+    { id: 8, name: 'custom-server', status: 'online', tools: 7, type: 'custom' },
+    { id: 9, name: 'my-project', status: 'online', tools: 32, type: 'project' },
+  ]);
+  
   // Tab management
   const [tabs, setTabs] = useState([
     { id: 1, label: 'MCP Flow', icon: <FlowIcon size={16} color="#fff" />, type: 'flow' },
   ]);
   const [selectedTab, setSelectedTab] = useState(1);
-  const [nextTabId, setNextTabId] = useState(2);
+  const [nextTabId, setNextTabId] = useState(10);
 
   const handleCreateMcpServer = () => {
     setIsAddMcpServerDialogOpen(false);
@@ -401,16 +409,33 @@ function App() {
     const serverData = {
       id: nextTabId,
       name: serverName,
-      status: 'running',
+      status: 'online',
       tools: 6,
       type: 'custom',
       authType: 'none'
     };
     
+    // Add server to available servers list
+    setAvailableServers(prev => [...prev, serverData]);
+    
+    // Create a canvas component with the new server selected
+    const newComponent = {
+      id: nextComponentId,
+      type: 'mcp-server',
+      position: { x: 200, y: 150 },
+      selectedServerId: serverData.id,
+      props: {}
+    };
+    
+    setCanvasComponents(prev => [...prev, newComponent]);
+    
+    // Show the side panel with the new server selected
     setSelectedServer(serverData);
     setShowServerSidePanel(true);
+    
     setIsServerNameDialogOpen(false);
     setNextTabId(prev => prev + 1);
+    setNextComponentId(prev => prev + 1);
   };
 
   const handleEditServer = (serverData) => {
@@ -464,10 +489,73 @@ function App() {
     handleCloseTab(selectedTab);
   };
 
+  // Canvas component handlers
+  const handleComponentServerChange = (componentId, serverId) => {
+    setCanvasComponents(prev =>
+      prev.map(comp =>
+        comp.id === componentId
+          ? { ...comp, selectedServerId: serverId }
+          : comp
+      )
+    );
+  };
+
+  const handleComponentRemove = (componentId) => {
+    setCanvasComponents(prev => prev.filter(comp => comp.id !== componentId));
+  };
+
+  const handleComponentPositionChange = (componentId, position) => {
+    setCanvasComponents(prev =>
+      prev.map(comp =>
+        comp.id === componentId
+          ? { ...comp, position }
+          : comp
+      )
+    );
+  };
+
+  const handleComponentSelect = (componentId) => {
+    setSelectedComponentId(componentId);
+  };
+
+  const handleCanvasClick = (e) => {
+    // Deselect component when clicking on empty canvas
+    if (e.target === e.currentTarget) {
+      setSelectedComponentId(null);
+    }
+  };
+
+  // Contextual toolbar handlers
+  const handleToolbarEditServer = () => {
+    const selectedComponent = canvasComponents.find(comp => comp.id === selectedComponentId);
+    if (selectedComponent) {
+      const serverData = availableServers.find(server => server.id === selectedComponent.selectedServerId);
+      if (serverData) {
+        setSelectedServer(serverData);
+        setShowServerSidePanel(true);
+      }
+    }
+  };
+
+  const handleToolbarCode = () => {
+    console.log('Code action triggered');
+    // TODO: Implement code view/edit functionality
+  };
+
+  const handleToolbarControls = () => {
+    console.log('Controls action triggered');
+    // TODO: Implement controls functionality
+  };
+
+  const handleToolbarMore = () => {
+    console.log('More actions triggered');
+    // TODO: Implement more actions menu
+  };
+
   const sidebarComponents = {
     agent: <AgentSidebar />,
     component: <ComponentsSidebar />,
-    mcp: <McpServersSidebar onAddServer={() => setIsAddMcpServerDialogOpen(true)} />,
+    mcp: <McpServersSidebar onAddServer={() => setIsAddMcpServerDialogOpen(true)} servers={availableServers} />,
     extensions: <BlocksSidebar />,
     annotations: <NotesSidebar />,
   };
@@ -494,9 +582,38 @@ function App() {
     }
 
     return (
-      <main className="main-content">
+      <main className="main-content" onClick={handleCanvasClick}>
         <FlowCanvasControls />
-        {/* Main content area for other tab types */}
+        {/* Canvas components */}
+        {canvasComponents.map((component) => {
+          if (component.type === 'mcp-server') {
+            return (
+              <McpServerComponent
+                key={component.id}
+                position={component.position}
+                selectedServerId={component.selectedServerId}
+                servers={availableServers}
+                isSelected={selectedComponentId === component.id}
+                onServerChange={(serverId) => handleComponentServerChange(component.id, serverId)}
+                onRemove={() => handleComponentRemove(component.id)}
+                onPositionChange={(position) => handleComponentPositionChange(component.id, position)}
+                onSelect={() => handleComponentSelect(component.id)}
+              />
+            );
+          }
+          return null;
+        })}
+        
+        {/* Contextual toolbar */}
+        {selectedComponentId && (
+          <ContextualToolbar
+            position={canvasComponents.find(comp => comp.id === selectedComponentId)?.position || { x: 0, y: 0 }}
+            onEditServer={handleToolbarEditServer}
+            onCode={handleToolbarCode}
+            onControls={handleToolbarControls}
+            onMore={handleToolbarMore}
+          />
+        )}
       </main>
     );
   };
@@ -507,7 +624,7 @@ function App() {
     if (currentTab && currentTab.type === 'mcp-builder') {
       return (
         <div className="sidebar-container">
-          <McpServersSidebar onAddServer={() => setIsAddMcpServerDialogOpen(true)} />
+          <McpServersSidebar onAddServer={() => setIsAddMcpServerDialogOpen(true)} servers={availableServers} />
         </div>
       );
     }
@@ -553,7 +670,7 @@ function App() {
         />
         <div className="mcp-builder-layout">
           <div className="sidebar-container">
-            <McpServersSidebar onAddServer={() => setIsAddMcpServerDialogOpen(true)} />
+            <McpServersSidebar onAddServer={() => setIsAddMcpServerDialogOpen(true)} servers={availableServers} />
           </div>
           <McpServerBuilder
             onClose={handleCloseMcpBuilder}

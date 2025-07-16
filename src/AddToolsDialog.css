@@ -1,0 +1,486 @@
+.add-tools-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  font-family: 'Inter', sans-serif;
+}
+
+.add-tools-dialog {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  width: 90vw;
+  max-width: 1200px;
+  height: 80vh;
+  max-height: 800px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+}
+
+.add-tools-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #27272a;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.add-tools-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+}
+
+.total-tools-count {
+  font-size: 13px;
+  color: #71717a;
+  font-weight: 500;
+}
+
+.add-tools-close-btn {
+  background: none;
+  border: none;
+  color: #71717a;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.add-tools-close-btn:hover {
+  color: #fff;
+  background: #27272a;
+}
+
+.add-tools-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Left Sidebar - Servers */
+.add-tools-servers {
+  width: 250px;
+  background: #1a1a1d;
+  border-right: 1px solid #27272a;
+  display: flex;
+  flex-direction: column;
+}
+
+.servers-header {
+  padding: 16px 20px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #71717a;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-bottom: 1px solid #27272a;
+}
+
+.servers-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.server-item {
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #27272a;
+}
+
+.server-item:hover {
+  background: #27272a;
+}
+
+.server-item.selected {
+  background: #1e3a8a;
+}
+
+.server-item.selected:hover {
+  background: #1d4ed8;
+}
+
+.server-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.server-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.server-tools-count {
+  font-size: 12px;
+  color: #71717a;
+}
+
+/* Center - Tools Table */
+.add-tools-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.tools-search {
+  padding: 16px 20px;
+  border-bottom: 1px solid #27272a;
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #71717a;
+}
+
+.search-input {
+  width: 100%;
+  background: #27272a;
+  border: 1px solid #3f3f46;
+  border-radius: 8px;
+  padding: 10px 12px 10px 40px;
+  color: #fff;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.search-input::placeholder {
+  color: #71717a;
+}
+
+.tools-table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.tools-table-header {
+  display: grid;
+  grid-template-columns: 40px 1fr 200px 180px;
+  gap: 16px;
+  padding: 12px 20px;
+  background: #1a1a1d;
+  border-bottom: 1px solid #27272a;
+  font-size: 12px;
+  font-weight: 600;
+  color: #71717a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tools-table-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.tool-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 200px 180px;
+  gap: 16px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #27272a;
+  align-items: center;
+}
+
+.tool-row:hover {
+  background: #27272a;
+}
+
+.tool-row.selected {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: #2563eb;
+}
+
+.table-col-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-col-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.table-col-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.table-col-slug {
+  font-size: 12px;
+  color: #71717a;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.table-col-count {
+  font-size: 12px;
+  color: #a1a1aa;
+  text-align: right;
+}
+
+/* Right Sidebar - Configuration */
+.add-tools-config {
+  width: 320px;
+  background: #1a1a1d;
+  border-left: 1px solid #27272a;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.config-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.config-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+}
+
+.config-more-btn {
+  background: none;
+  border: none;
+  color: #71717a;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.config-more-btn:hover {
+  color: #fff;
+  background: #27272a;
+}
+
+.config-description {
+  font-size: 14px;
+  color: #a1a1aa;
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.config-section h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 8px 0;
+}
+
+.config-section-desc {
+  font-size: 12px;
+  color: #71717a;
+  margin: 0 0 16px 0;
+}
+
+.config-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.config-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.config-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #a1a1aa;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.required {
+  color: #ef4444;
+}
+
+.help-icon {
+  color: #71717a;
+  cursor: help;
+}
+
+.config-input {
+  background: #27272a;
+  border: 1px solid #3f3f46;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.config-input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.config-input::placeholder {
+  color: #71717a;
+}
+
+.config-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: #71717a;
+}
+
+.config-placeholder h3 {
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+/* Over-tooled Warning */
+.over-tooled-warning {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 8px;
+  margin: 16px 24px 0 24px;
+  padding: 0;
+}
+
+.warning-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.warning-icon {
+  color: #f59e0b;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.warning-text {
+  font-size: 13px;
+  color: #f59e0b;
+  line-height: 1.4;
+}
+
+.warning-text strong {
+  font-weight: 600;
+}
+
+/* Footer */
+.add-tools-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid #27272a;
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid #52525b;
+  color: #fff;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #27272a;
+  border-color: #71717a;
+}
+
+.btn-primary {
+  background: #2563eb;
+  border: 1px solid #2563eb;
+  color: #fff;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.btn-primary.btn-warning {
+  background: #d97706;
+  border-color: #d97706;
+}
+
+.btn-primary.btn-warning:hover {
+  background: #b45309;
+  border-color: #b45309;
+}
+
+/* Scrollbar styling */
+.servers-list::-webkit-scrollbar,
+.tools-table-body::-webkit-scrollbar,
+.add-tools-config::-webkit-scrollbar {
+  width: 6px;
+}
+
+.servers-list::-webkit-scrollbar-track,
+.tools-table-body::-webkit-scrollbar-track,
+.add-tools-config::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.servers-list::-webkit-scrollbar-thumb,
+.tools-table-body::-webkit-scrollbar-thumb,
+.add-tools-config::-webkit-scrollbar-thumb {
+  background: #52525b;
+  border-radius: 3px;
+}
+
+.servers-list::-webkit-scrollbar-thumb:hover,
+.tools-table-body::-webkit-scrollbar-thumb:hover,
+.add-tools-config::-webkit-scrollbar-thumb:hover {
+  background: #71717a;
+} 

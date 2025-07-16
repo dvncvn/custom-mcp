@@ -68,13 +68,17 @@
 }
 
 .side-panel-tab {
-  padding: 8px 16px;
-  font-size: 14px;
+  padding: 6px 16px;
+  font-size: 12px;
   font-weight: 500;
   color: #71717a;
   cursor: pointer;
   border-bottom: 2px solid transparent;
   transition: color 0.2s, border-color 0.2s;
+  height: 28px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
 }
 
 .side-panel-tab.active {
@@ -175,6 +179,7 @@
 }
 
 .side-panel-input {
+  width: 100%;
   background: #18181b;
   border: 1px solid #52525b;
   border-radius: 8px;
@@ -183,6 +188,7 @@
   color: #fff;
   font-family: 'Inter', sans-serif;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 .side-panel-input:focus {
@@ -271,7 +277,9 @@
   justify-content: space-between;
   background: #27272a;
   border-radius: 8px;
-  padding: 12px 16px;
+  padding: 8px 16px;
+  height: 40px;
+  box-sizing: border-box;
 }
 
 .status-indicator {
@@ -323,10 +331,41 @@
   margin-top: 4px;
 }
 
+.auth-fields {
+  margin-top: 12px;
+}
+
+.auth-field {
+  margin-bottom: 16px;
+}
+
+.auth-field:last-child {
+  margin-bottom: 0;
+}
+
+.auth-field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #a1a1aa;
+  margin-bottom: 4px;
+}
+
 .tools-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.tools-label-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tools-warning-icon {
+  color: #f59e0b;
+  flex-shrink: 0;
 }
 
 .add-tools-btn {
@@ -354,16 +393,102 @@
   flex-direction: row;
   flex-wrap: wrap;
   gap: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.tools-list.over-tooled {
+  background: rgba(245, 158, 11, 0.05);
+  border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .tool-item {
   background: #27272a;
   color: #fff;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 500;
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 6px 10px;
+  border-radius: 4px;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
   flex-shrink: 0;
   white-space: nowrap;
+  max-height: 22px;
+}
+
+/* Confirmation Dialog Styles */
+.confirmation-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1002;
+}
+
+.confirmation-dialog {
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  width: calc(100% - 32px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+.confirmation-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 8px 0;
+}
+
+.confirmation-message {
+  font-size: 14px;
+  color: #a1a1aa;
+  margin: 0 0 20px 0;
+  line-height: 1.5;
+}
+
+.confirmation-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.confirmation-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  border: 1px solid;
+}
+
+.confirmation-btn.secondary {
+  background: transparent;
+  border-color: #52525b;
+  color: #fff;
+}
+
+.confirmation-btn.secondary:hover {
+  background: #27272a;
+  border-color: #71717a;
+}
+
+.confirmation-btn.primary {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+}
+
+.confirmation-btn.primary:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
 } 

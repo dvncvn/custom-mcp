@@ -1,0 +1,73 @@
+.contextual-toolbar {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  z-index: 300;
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: #a1a1aa;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 32px;
+}
+
+.toolbar-btn:hover {
+  background: #27272a;
+  color: #fff;
+}
+
+.toolbar-btn:active {
+  background: #3f3f46;
+}
+
+.toolbar-btn-icon {
+  padding: 8px;
+  gap: 0;
+}
+
+.toolbar-btn span {
+  user-select: none;
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background: #27272a;
+  margin: 0 4px;
+}
+
+/* Hover effect for the entire toolbar */
+.contextual-toolbar::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+  border-radius: 10px;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.contextual-toolbar:hover::before {
+  opacity: 1;
+} 
