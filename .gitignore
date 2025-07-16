@@ -72,7 +72,7 @@ coverage/
 
 # gatsby files
 .cache/
-public
+# public
 
 # Storybook build outputs
 .out
@@ -88,4 +88,7 @@ temp/
 # Windows
 Thumbs.db
 ehthumbs.db
-Desktop.ini 
+Desktop.ini
+
+# Temporary files
+generate-icons.js 
