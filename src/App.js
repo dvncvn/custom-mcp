@@ -284,6 +284,51 @@ function NotesSidebar() {
   );
 }
 
+const agentTemplates = [
+  { 
+    key: 'starter-agent', 
+    icon: <Bot size={16} />, 
+    label: 'Starter Agent',
+    description: 'Basic conversational agent',
+    type: 'starter'
+  },
+  { 
+    key: 'coding-assistant', 
+    icon: <Code size={16} />, 
+    label: 'Coding Assistant',
+    description: 'Helps with programming tasks',
+    type: 'template'
+  },
+  { 
+    key: 'research-agent', 
+    icon: <Search size={16} />, 
+    label: 'Research Agent',
+    description: 'Gathers and analyzes information',
+    type: 'template'
+  },
+  { 
+    key: 'data-analyst', 
+    icon: <Database size={16} />, 
+    label: 'Data Analyst',
+    description: 'Processes and visualizes data',
+    type: 'template'
+  },
+  { 
+    key: 'content-writer', 
+    icon: <FileText size={16} />, 
+    label: 'Content Writer',
+    description: 'Creates engaging written content',
+    type: 'template'
+  },
+  { 
+    key: 'customer-support', 
+    icon: <MessageSquare size={16} />, 
+    label: 'Customer Support',
+    description: 'Handles customer inquiries',
+    type: 'template'
+  }
+];
+
 function AgentSidebar() {
   return (
     <aside className="components-sidebar">
@@ -298,9 +343,35 @@ function AgentSidebar() {
           <span className="sidebar-search-slash">/</span>
         </div>
       </div>
-      <div className="sidebar-header">AGENT</div>
+      <div className="sidebar-header">AGENTS</div>
       <div className="sidebar-list">
-        {/* Placeholder for agent content */}
+        {agentTemplates.map((agent) => (
+          <div className="sidebar-item" key={agent.key}>
+            <div className="sidebar-item-content">
+              <span className="sidebar-icon">{agent.icon}</span>
+              <div className="agent-info">
+                <span className="sidebar-label">{agent.label}</span>
+                <span className="agent-description">{agent.description}</span>
+              </div>
+              {agent.type === 'starter' && <span className="starter-badge">Starter</span>}
+              <span className="sidebar-grip"><GripHorizontal size={16} /></span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="sidebar-footer">
+        <div className="sidebar-item">
+          <div className="sidebar-item-content">
+            <span className="sidebar-icon"><Plus size={16} /></span>
+            <span className="sidebar-label">New Agent</span>
+          </div>
+        </div>
+        <div className="sidebar-item">
+          <div className="sidebar-item-content">
+            <span className="sidebar-icon"><ExternalLink size={16} /></span>
+            <span className="sidebar-label">Browse Templates</span>
+          </div>
+        </div>
       </div>
     </aside>
   );

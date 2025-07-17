@@ -377,6 +377,16 @@
   flex-shrink: 0; /* Prevent from shrinking */
 }
 
+.starter-badge {
+  font-size: 11px;
+  font-weight: 500;
+  background-color: #22c55e;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 6px;
+  flex-shrink: 0; /* Prevent from shrinking */
+}
+
 .project-icon {
   color: #a1a1aa;
   flex-shrink: 0; /* Prevent from shrinking */
@@ -480,6 +490,26 @@
   padding: 0;
   margin-top: 2px;
   margin-left: 25px; /* Indent for status icon width + gap */
+}
+
+/* Agent sidebar - two line layout */
+.agent-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0; /* Allow text truncation */
+}
+
+.agent-description {
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #71717a;
+  line-height: 14px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Search bar */
