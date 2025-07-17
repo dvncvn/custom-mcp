@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, ArrowLeft } from 'lucide-react';
 import { McpIcon } from './icons';
 import './AddMcpServerDialog.css';
 
-export default function ServerNameDialog({ onClose, onCreate }) {
+export default function ServerNameDialog({ onClose, onCreate, onBack }) {
   const [serverName, setServerName] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState(null);
 
   const handleCreate = () => {
     if (!serverName.trim()) {
@@ -21,7 +21,7 @@ export default function ServerNameDialog({ onClose, onCreate }) {
   const handleInputChange = (e) => {
     setServerName(e.target.value);
     if (error) {
-      setError('');
+      setError(null);
     }
   };
 
@@ -35,6 +35,11 @@ export default function ServerNameDialog({ onClose, onCreate }) {
     <div className="dialog-backdrop" onClick={onClose}>
       <div className="dialog-container" onClick={(e) => e.stopPropagation()}>
         <div className="dialog-header">
+          {onBack && (
+            <button onClick={onBack} className="dialog-back-btn">
+              <ArrowLeft size={18} />
+            </button>
+          )}
           <div className="dialog-title">
             <McpIcon />
             <span>Create Custom MCP Server</span>

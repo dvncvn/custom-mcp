@@ -26,6 +26,21 @@ import {
   Share,
   ChevronDown,
   FileText,
+  Terminal,
+  ZoomIn,
+  ZoomOut,
+  Focus,
+  Minus,
+  X,
+  Type,
+  Square,
+  PlayCircle,
+  Network,
+  Book,
+  Keyboard,
+  Bug,
+  Download,
+  ArrowUpRight,
 } from 'lucide-react';
 import { McpIcon, AgentIcon, ComponentsIcon, BlocksIcon, NotesIcon, FlowIcon, ExtensionsIcon, AnnotationsIcon } from './icons';
 import AddMcpServerDialog from './AddMcpServerDialog';
@@ -34,11 +49,14 @@ import ServerNameDialog from './ServerNameDialog';
 import McpServerSidePanel from './McpServerSidePanel';
 import McpServerComponent from './McpServerComponent';
 import ContextualToolbar from './ContextualToolbar';
+import AddToolsDialog from './AddToolsDialog';
+import ServerManagement from './ServerManagement';
+import ProjectSidebar from './ProjectSidebar';
 
 const leftNavItems = [
-  { key: 'agent', icon: <AgentIcon size={20} />, label: 'Agent' },
-  { key: 'component', icon: <ComponentsIcon size={20} />, label: 'Component' },
-  { key: 'mcp', icon: <McpIcon size={20} />, label: 'MCP' },
+  { key: 'agent', icon: <AgentIcon size={20} />, label: 'Agents' },
+  { key: 'component', icon: <ComponentsIcon size={20} />, label: 'Components' },
+  { key: 'mcp', icon: <McpIcon size={20} />, label: 'MCP Servers' },
   { key: 'extensions', icon: <ExtensionsIcon size={20} />, label: 'Extensions' },
   { key: 'annotations', icon: <AnnotationsIcon size={20} />, label: 'Annotations' },
 ];
@@ -54,6 +72,13 @@ const componentsSidebarItems = [
   { key: 'news-search', icon: <MessageSquare size={16} />, label: 'News Search' },
   { key: 'web-search', icon: <Search size={16} />, label: 'Web Search' },
   { key: 'webhook', icon: <Plus size={16} />, label: 'Webhook' },
+];
+
+const annotationItems = [
+  { key: 'sticky-note', icon: <StickyNote size={16} />, label: 'Sticky Note' },
+  { key: 'text', icon: <Type size={16} />, label: 'Text' },
+  { key: 'section', icon: <Square size={16} />, label: 'Section' },
+  { key: 'readme', icon: <FileText size={16} />, label: 'README' },
 ];
 
 function TopNav({ tabs, selectedTab, setSelectedTab, onCloseTab }) {
@@ -111,6 +136,8 @@ function TopNav({ tabs, selectedTab, setSelectedTab, onCloseTab }) {
 }
 
 function LeftNav({ focused, setFocused, isSidebarOpen, setIsSidebarOpen }) {
+  const [hoveredItem, setHoveredItem] = useState(null);
+
   const handleClick = (itemKey) => {
     if (itemKey === focused) {
       // If clicking the currently focused item, toggle the sidebar
@@ -125,16 +152,23 @@ function LeftNav({ focused, setFocused, isSidebarOpen, setIsSidebarOpen }) {
   return (
     <aside className="left-nav">
       {leftNavItems.map((item) => (
-        <button
-          key={item.key}
-          className={`left-nav-btn${isSidebarOpen && focused === item.key ? ' focused' : ''}`}
-          onClick={() => handleClick(item.key)}
-          title={item.label}
-        >
-          {React.cloneElement(item.icon, {
-            color: isSidebarOpen && focused === item.key ? '#fff' : '#A1A1AA'
-          })}
-        </button>
+        <div key={item.key} className="left-nav-item-container">
+          <button
+            className={`left-nav-btn${isSidebarOpen && focused === item.key ? ' focused' : ''}`}
+            onClick={() => handleClick(item.key)}
+            onMouseEnter={() => setHoveredItem(item.key)}
+            onMouseLeave={() => setHoveredItem(null)}
+          >
+            {React.cloneElement(item.icon, {
+              color: isSidebarOpen && focused === item.key ? '#fff' : '#A1A1AA'
+            })}
+          </button>
+          {hoveredItem === item.key && !isSidebarOpen && (
+            <div className="left-nav-tooltip">
+              {item.label}
+            </div>
+          )}
+        </div>
       ))}
     </aside>
   );
@@ -184,7 +218,7 @@ function ComponentsSidebar() {
   );
 }
 
-function McpServersSidebar({ onAddServer, servers }) {
+function McpServersSidebar({ onAddServer, onManageServers, servers }) {
   return (
     <aside className="components-sidebar mcp-servers-sidebar">
       <div className="sidebar-search-row">
@@ -229,7 +263,7 @@ function McpServersSidebar({ onAddServer, servers }) {
             <span className="sidebar-label">Add MCP Server</span>
           </div>
         </div>
-        <div className="sidebar-item">
+        <div className="sidebar-item" onClick={onManageServers}>
           <div className="sidebar-item-content">
             <span className="sidebar-icon"><ExternalLink size={16} /></span>
             <span className="sidebar-label">Manage Servers</span>
@@ -278,7 +312,15 @@ function NotesSidebar() {
       </div>
       <div className="sidebar-header">ANNOTATIONS</div>
       <div className="sidebar-list">
-        {/* Placeholder for annotations */}
+        {annotationItems.map((item) => (
+          <div className="sidebar-item" key={item.key}>
+            <div className="sidebar-item-content">
+              <span className="sidebar-icon">{item.icon}</span>
+              <span className="sidebar-label">{item.label}</span>
+              <span className="sidebar-grip"><GripHorizontal size={16} /></span>
+            </div>
+          </div>
+        ))}
       </div>
     </aside>
   );
@@ -287,7 +329,7 @@ function NotesSidebar() {
 const agentTemplates = [
   { 
     key: 'starter-agent', 
-    icon: <Bot size={16} />, 
+    icon: <AgentIcon size={16} />, 
     label: 'Starter Agent',
     description: 'Basic conversational agent',
     type: 'starter'
@@ -377,8 +419,30 @@ function AgentSidebar() {
   );
 }
 
-function FlowCanvasControls() {
+function FlowCanvasControls({ onLogsToggle, isLogsOpen, onHelpToggle, isHelpMenuOpen, isSidebarOpen, showServerSidePanel, sidePanelWidth }) {
   const [shareDropdownOpen, setShareDropdownOpen] = useState(false);
+
+  const mockLogs = [
+    { id: 1, timestamp: '12:34:56.789', level: 'INFO', source: 'MCP Server', message: 'Connected to Gmail MCP server successfully' },
+    { id: 2, timestamp: '12:34:57.123', level: 'DEBUG', source: 'Agent', message: 'Processing user request: "Create a draft email"' },
+    { id: 3, timestamp: '12:34:57.456', level: 'INFO', source: 'Tool', message: 'Executing GMAIL_CREATE_EMAIL_DRAFT with parameters' },
+    { id: 4, timestamp: '12:34:57.789', level: 'SUCCESS', source: 'Tool', message: 'Email draft created successfully with ID: draft_abc123' },
+    { id: 5, timestamp: '12:34:58.012', level: 'INFO', source: 'Agent', message: 'Task completed: Email draft ready for review' },
+    { id: 6, timestamp: '12:34:58.345', level: 'WARN', source: 'MCP Server', message: 'Rate limit warning: 85% of quota used' },
+    { id: 7, timestamp: '12:34:58.678', level: 'DEBUG', source: 'System', message: 'Memory usage: 245MB, CPU: 12%' },
+    { id: 8, timestamp: '12:34:59.001', level: 'ERROR', source: 'Tool', message: 'Failed to access calendar: Authentication expired' },
+  ];
+
+  const getLevelColor = (level) => {
+    switch (level) {
+      case 'ERROR': return '#ef4444';
+      case 'WARN': return '#f59e0b';
+      case 'SUCCESS': return '#22c55e';
+      case 'INFO': return '#3b82f6';
+      case 'DEBUG': return '#71717a';
+      default: return '#a1a1aa';
+    }
+  };
 
   // Close dropdown when clicking outside
   React.useEffect(() => {
@@ -422,21 +486,131 @@ function FlowCanvasControls() {
         </div>
       </div>
 
-      {/* Bottom left controls */}
-      <div className="flow-canvas-bottom-controls">
-        <button className="flow-canvas-btn logs-btn">
-          <FileText size={16} />
-          Logs
-        </button>
+      {/* Bottom left controls - zoom and logs stacked */}
+      <div 
+        className={`flow-canvas-bottom-controls${isLogsOpen ? ' logs-open' : ''}`}
+        style={{
+          left: `${isSidebarOpen ? 296 : 8}px`, // 8px from sidebar edge when open, 8px from window edge when closed
+          ...(isLogsOpen ? {
+            right: `${showServerSidePanel ? sidePanelWidth : 8}px`
+          } : {})
+        }}
+      >
+        {/* Zoom controls group */}
+        <div className="zoom-controls-block">
+          <div className="zoom-control-group">
+            <button className="flow-canvas-btn zoom-btn" title="Zoom">
+              <ZoomIn size={16} />
+            </button>
+            <div className="zoom-hover-controls">
+              <button className="flow-canvas-btn zoom-in-btn" title="Zoom In">
+                <Plus size={16} />
+              </button>
+              <button className="flow-canvas-btn zoom-out-btn" title="Zoom Out">
+                <Minus size={16} />
+              </button>
+            </div>
+          </div>
+          <button className="flow-canvas-btn fit-screen-btn" title="Fit to Screen">
+            <Focus size={16} />
+          </button>
+        </div>
+
+        {/* Logs container */}
+        <div 
+          className={`logs-container${isLogsOpen ? ' expanded' : ''}`}
+          onClick={!isLogsOpen ? onLogsToggle : undefined}
+        >
+          {/* Button state (collapsed) */}
+          {!isLogsOpen && (
+            <div className="logs-button">
+              <Terminal size={16} />
+              <span>Logs</span>
+            </div>
+          )}
+          
+          {/* Panel state (expanded) */}
+          {isLogsOpen && (
+            <>
+              <div className="logs-panel-header">
+                <button className="logs-tab-button" onClick={onLogsToggle}>
+                  <Terminal size={16} />
+                  <span>Logs</span>
+                  <span className="logs-count">({mockLogs.length})</span>
+                </button>
+                <div className="logs-controls">
+                  <button className="logs-clear-btn">Clear</button>
+                  <button className="logs-close-btn" onClick={onLogsToggle}>
+                    <X size={16} />
+                  </button>
+                </div>
+              </div>
+              <div className="logs-content">
+                <div className="logs-table">
+                  {mockLogs.map((log) => (
+                    <div key={log.id} className="log-entry">
+                      <span className="log-timestamp">{log.timestamp}</span>
+                      <span 
+                        className="log-level" 
+                        style={{ color: getLevelColor(log.level) }}
+                      >
+                        {log.level}
+                      </span>
+                      <span className="log-source">{log.source}</span>
+                      <span className="log-message">{log.message}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Bottom right help button */}
-      <button className="flow-canvas-help-btn" title="Help">
-        <HelpCircle size={16} />
-      </button>
+      <div className={`help-menu-container${isLogsOpen ? ' logs-open' : ''}`}>
+        <button 
+          className={`flow-canvas-help-btn${isHelpMenuOpen ? ' active' : ''}`} 
+          onClick={onHelpToggle}
+          title="Help"
+        >
+          <HelpCircle size={16} />
+        </button>
+        {isHelpMenuOpen && (
+          <div className="help-menu">
+            <div className="help-menu-item">
+              <PlayCircle size={16} />
+              <span>Quickstart tutorial</span>
+            </div>
+            <div className="help-menu-item">
+              <Network size={16} />
+              <span>Connection colors legend</span>
+              <ArrowUpRight size={14} className="help-menu-external" />
+            </div>
+            <div className="help-menu-item">
+              <Book size={16} />
+              <span>Docs</span>
+            </div>
+            <div className="help-menu-item">
+              <Keyboard size={16} />
+              <span>Shortcuts</span>
+            </div>
+            <div className="help-menu-item">
+              <Bug size={16} />
+              <span>Report a bug</span>
+            </div>
+            <div className="help-menu-item">
+              <Download size={16} />
+              <span>Get Langflow Desktop</span>
+            </div>
+          </div>
+        )}
+      </div>
     </>
   );
 }
+
+
 
 function App() {
   const [focused, setFocused] = useState(leftNavItems[0].key);
@@ -446,6 +620,10 @@ function App() {
   const [selectedServer, setSelectedServer] = useState(null);
   const [showServerSidePanel, setShowServerSidePanel] = useState(false);
   const [sidePanelWidth, setSidePanelWidth] = useState(400);
+  const [isLogsOpen, setIsLogsOpen] = useState(false);
+  const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false);
+  const [showAddToolsDialog, setShowAddToolsDialog] = useState(false);
+  const [isToolModeEnabled, setIsToolModeEnabled] = useState(false);
   
   // Canvas components management
   const [canvasComponents, setCanvasComponents] = useState([]);
@@ -454,15 +632,43 @@ function App() {
   
   // Available servers (existing + custom)
   const [availableServers, setAvailableServers] = useState([
-    { id: 1, name: 'supabase-mcp', status: 'online', tools: 17 },
-    { id: 2, name: 'google-maps', status: 'online', tools: 8 },
-    { id: 3, name: 'mem0-memory-mcp', status: 'online', tools: 8 },
-    { id: 4, name: 'exa', status: 'online', tools: 8 },
-    { id: 5, name: 'echo-mcp', status: 'offline', tools: 3 },
-    { id: 6, name: 'github', status: 'online', tools: 18 },
-    { id: 7, name: 'my-server', status: 'online', tools: 4, type: 'custom' },
-    { id: 8, name: 'custom-server', status: 'online', tools: 7, type: 'custom' },
-    { id: 9, name: 'my-project', status: 'online', tools: 32, type: 'project' },
+    { 
+      id: 1, 
+      name: 'supabase-hybrid', 
+      status: 'online', 
+      tools: 10,
+      authType: 'apiKey',
+      description: 'Supabase database integration with hybrid authentication',
+      toolList: ['create_table', 'insert_data', 'query_data', 'update_record', 'delete_record', 'create_index', 'backup_database', 'restore_database', 'manage_users', 'set_permissions']
+    },
+    { 
+      id: 2, 
+      name: 'ragbot_project', 
+      status: 'online', 
+      tools: 8, 
+      warning: 'No auth',
+      authType: 'none',
+      description: 'RAG-based chatbot with document processing capabilities',
+      toolList: ['index_documents', 'search_documents', 'generate_response', 'update_index', 'delete_documents', 'get_metadata', 'process_pdf', 'extract_text']
+    },
+    { 
+      id: 3, 
+      name: 'google_maps', 
+      status: 'online', 
+      tools: 15,
+      authType: 'apiKey',
+      description: 'Google Maps integration for location services and geocoding',
+      toolList: ['geocode_address', 'reverse_geocode', 'get_directions', 'find_places', 'get_place_details', 'calculate_distance', 'get_elevation', 'get_timezone', 'street_view', 'static_map', 'roads_api', 'places_autocomplete', 'nearby_search', 'text_search', 'place_photos']
+    },
+    { 
+      id: 4, 
+      name: 'notion', 
+      status: 'online', 
+      tools: 3,
+      authType: 'bearer',
+      description: 'Notion workspace integration for content management',
+      toolList: ['create_page', 'update_page', 'query_database']
+    },
   ]);
   
   // Tab management
@@ -475,6 +681,11 @@ function App() {
   const handleCreateMcpServer = () => {
     setIsAddMcpServerDialogOpen(false);
     setIsServerNameDialogOpen(true);
+  };
+
+  const handleServerNameBack = () => {
+    setIsServerNameDialogOpen(false);
+    setIsAddMcpServerDialogOpen(true);
   };
 
   const handleServerCreate = (serverName) => {
@@ -534,6 +745,42 @@ function App() {
   const handleCloseSidePanel = () => {
     setShowServerSidePanel(false);
     setSelectedServer(null);
+  };
+
+  const handleLogsToggle = () => {
+    setIsLogsOpen(!isLogsOpen);
+  };
+
+  const handleHelpToggle = () => {
+    setIsHelpMenuOpen(!isHelpMenuOpen);
+  };
+
+  // Close help menu when clicking outside
+  React.useEffect(() => {
+    function handleClickOutside(event) {
+      if (isHelpMenuOpen && !event.target.closest('.help-menu-container')) {
+        setIsHelpMenuOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isHelpMenuOpen]);
+
+  const handleOpenAddTools = () => {
+    setShowAddToolsDialog(true);
+  };
+
+  const handleCloseAddTools = () => {
+    setShowAddToolsDialog(false);
+  };
+
+  const handleSaveTools = (selectedTools, toolConfig) => {
+    console.log('Tools saved:', { selectedTools, toolConfig });
+    // TODO: Implement tool saving logic
+    setShowAddToolsDialog(false);
   };
 
   const handleCloseTab = (tabId) => {
@@ -624,10 +871,32 @@ function App() {
     // TODO: Implement more actions menu
   };
 
+  const handleToolbarToolMode = () => {
+    setIsToolModeEnabled(!isToolModeEnabled);
+  };
+
+  const handleManageServers = () => {
+    const newTab = {
+      id: nextTabId,
+      label: 'Manage Servers',
+      icon: <Settings2 size={16} color="#fff" />,
+      type: 'server-management'
+    };
+    
+    setTabs(prev => [...prev, newTab]);
+    setSelectedTab(nextTabId);
+    setNextTabId(prev => prev + 1);
+  };
+
+  const handleServerManagementSelect = (serverData) => {
+    setSelectedServer(serverData);
+    setShowServerSidePanel(true);
+  };
+
   const sidebarComponents = {
     agent: <AgentSidebar />,
     component: <ComponentsSidebar />,
-    mcp: <McpServersSidebar onAddServer={() => setIsAddMcpServerDialogOpen(true)} servers={availableServers} />,
+    mcp: <McpServersSidebar onAddServer={() => setIsAddMcpServerDialogOpen(true)} onManageServers={handleManageServers} servers={availableServers} />,
     extensions: <BlocksSidebar />,
     annotations: <NotesSidebar />,
   };
@@ -656,13 +925,23 @@ function App() {
       );
     }
 
+
+
     return (
       <main 
         className={`main-content${showServerSidePanel ? ' side-panel-open' : ''}`} 
         style={{ marginRight: showServerSidePanel ? `${sidePanelWidth}px` : '0' }}
         onClick={handleCanvasClick}
       >
-        <FlowCanvasControls />
+        <FlowCanvasControls 
+          onLogsToggle={handleLogsToggle}
+          isLogsOpen={isLogsOpen}
+          onHelpToggle={handleHelpToggle}
+          isHelpMenuOpen={isHelpMenuOpen}
+          isSidebarOpen={isSidebarOpen}
+          showServerSidePanel={showServerSidePanel}
+          sidePanelWidth={sidePanelWidth}
+        />
         {/* Canvas components */}
         {canvasComponents.map((component) => {
           if (component.type === 'mcp-server') {
@@ -677,6 +956,7 @@ function App() {
                 onRemove={() => handleComponentRemove(component.id)}
                 onPositionChange={(position) => handleComponentPositionChange(component.id, position)}
                 onSelect={() => handleComponentSelect(component.id)}
+                onEditServer={handleToolbarEditServer}
               />
             );
           }
@@ -687,7 +967,8 @@ function App() {
         {selectedComponentId && (
           <ContextualToolbar
             position={canvasComponents.find(comp => comp.id === selectedComponentId)?.position || { x: 0, y: 0 }}
-            onEditServer={handleToolbarEditServer}
+            onToolMode={handleToolbarToolMode}
+            isToolModeEnabled={isToolModeEnabled}
             onCode={handleToolbarCode}
             onControls={handleToolbarControls}
             onMore={handleToolbarMore}
@@ -698,16 +979,6 @@ function App() {
   };
 
   const renderSidebar = () => {
-    const currentTab = tabs.find(tab => tab.id === selectedTab);
-    
-    if (currentTab && currentTab.type === 'mcp-builder') {
-      return (
-        <div className="sidebar-container">
-          <McpServersSidebar onAddServer={() => setIsAddMcpServerDialogOpen(true)} servers={availableServers} />
-        </div>
-      );
-    }
-
     return (
       <div className={`sidebar-container${!isSidebarOpen ? ' collapsed' : ''}`}>
         {sidebarComponents[focused]}
@@ -731,6 +1002,7 @@ function App() {
           <ServerNameDialog 
             onClose={() => setIsServerNameDialogOpen(false)}
             onCreate={handleServerCreate}
+            onBack={handleServerNameBack}
           />
         )}
         {showServerSidePanel && selectedServer && (
@@ -740,6 +1012,7 @@ function App() {
             onEdit={handleEditServer}
             onDelete={handleDeleteServer}
             onWidthChange={setSidePanelWidth}
+            onOpenAddTools={handleOpenAddTools}
           />
         )}
         <TopNav 
@@ -748,14 +1021,76 @@ function App() {
           setSelectedTab={setSelectedTab}
           onCloseTab={handleCloseTab}
         />
-        <div className="mcp-builder-layout">
-          <div className="sidebar-container">
-            <McpServersSidebar onAddServer={() => setIsAddMcpServerDialogOpen(true)} servers={availableServers} />
+        <div className={`main-layout${!isSidebarOpen ? ' sidebar-collapsed' : ''}`}>
+          <LeftNav
+            focused={focused}
+            setFocused={setFocused}
+            isSidebarOpen={isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
+          />
+          <div className={`sidebar-container${!isSidebarOpen ? ' collapsed' : ''}`}>
+            <McpServersSidebar onAddServer={() => setIsAddMcpServerDialogOpen(true)} onManageServers={handleManageServers} servers={availableServers} />
           </div>
           <McpServerBuilder
             onClose={handleCloseMcpBuilder}
             onSave={handleSaveMcpServer}
             initialData={currentTab.data}
+            isSidebarOpen={isSidebarOpen}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Render Server Management with sidebar
+  if (currentTab && currentTab.type === 'server-management') {
+    return (
+      <div className="app-prototype">
+        {isAddMcpServerDialogOpen && (
+          <AddMcpServerDialog 
+            onClose={() => setIsAddMcpServerDialogOpen(false)}
+            onCreateCustomServer={handleCreateMcpServer}
+          />
+        )}
+        {isServerNameDialogOpen && (
+          <ServerNameDialog 
+            onClose={() => setIsServerNameDialogOpen(false)}
+            onCreate={handleServerCreate}
+            onBack={handleServerNameBack}
+          />
+        )}
+        {showServerSidePanel && selectedServer && (
+          <McpServerSidePanel 
+            serverData={selectedServer}
+            onClose={handleCloseSidePanel}
+            onEdit={handleEditServer}
+            onDelete={handleDeleteServer}
+            onWidthChange={setSidePanelWidth}
+            onOpenAddTools={handleOpenAddTools}
+          />
+        )}
+        <TopNav 
+          tabs={tabs}
+          selectedTab={selectedTab}
+          setSelectedTab={setSelectedTab}
+          onCloseTab={handleCloseTab}
+        />
+        <div className={`main-layout${!isSidebarOpen ? ' sidebar-collapsed' : ''}`}>
+          <LeftNav
+            focused={focused}
+            setFocused={setFocused}
+            isSidebarOpen={isSidebarOpen}
+            setIsSidebarOpen={setIsSidebarOpen}
+          />
+          <div className={`sidebar-container${!isSidebarOpen ? ' collapsed' : ''}`}>
+            <ProjectSidebar />
+          </div>
+          <ServerManagement
+            servers={availableServers}
+            onAddServer={() => setIsAddMcpServerDialogOpen(true)}
+            onServerSelect={handleServerManagementSelect}
+            selectedServerId={selectedServer?.id}
+            isSidebarOpen={isSidebarOpen}
           />
         </div>
       </div>
@@ -775,6 +1110,7 @@ function App() {
         <ServerNameDialog 
           onClose={() => setIsServerNameDialogOpen(false)}
           onCreate={handleServerCreate}
+          onBack={handleServerNameBack}
         />
       )}
       {showServerSidePanel && selectedServer && (
@@ -783,6 +1119,7 @@ function App() {
           onClose={handleCloseSidePanel}
           onEdit={handleEditServer}
           onDelete={handleDeleteServer}
+          onOpenAddTools={handleOpenAddTools}
         />
       )}
       <TopNav 
@@ -801,6 +1138,13 @@ function App() {
         {renderSidebar()}
         {renderMainContent()}
       </div>
+
+      {showAddToolsDialog && (
+        <AddToolsDialog 
+          onClose={handleCloseAddTools}
+          onSave={handleSaveTools}
+        />
+      )}
     </div>
   );
 }

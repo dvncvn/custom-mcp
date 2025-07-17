@@ -208,6 +208,71 @@
   color: #fff;
 }
 
+/* Left Nav Tooltips */
+.left-nav-item-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.left-nav-tooltip {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+  white-space: nowrap;
+  z-index: 1000;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: tooltip-fade-in 0.15s ease-out;
+}
+
+.left-nav-tooltip::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -4px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-right: 4px solid #27272a;
+}
+
+.left-nav-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -3px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-right: 4px solid #18181b;
+}
+
+@keyframes tooltip-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+
+
 .sidebar-container {
   width: 240px;
   flex-shrink: 0;
@@ -259,9 +324,13 @@
   padding: 8px; /* Internal padding for content */
   margin-bottom: 2px;
   border-radius: 6px;
-  cursor: pointer;
+  cursor: grab;
   transition: background 0.15s;
   position: relative;
+}
+
+.sidebar-item:active {
+  cursor: grabbing;
 }
 .sidebar-item:hover {
   background: #27272a;
@@ -317,8 +386,12 @@
   justify-content: space-between;
   padding: 4px 8px;
   border-radius: 6px;
-  cursor: pointer;
+  cursor: grab;
   position: relative; /* For absolute positioning of grip icon */
+}
+
+.mcp-server-item:active {
+  cursor: grabbing;
 }
 
 .mcp-server-item:hover {
@@ -568,6 +641,11 @@
 
 .sidebar-footer .sidebar-item {
   margin-bottom: 0;
+  cursor: pointer; /* Footer items are action buttons, not draggable */
+}
+
+.sidebar-footer .sidebar-item:active {
+  cursor: pointer; /* Keep pointer for footer action buttons */
 }
 
 .mcp-server-actions .mcp-server-add-btn, .mcp-server-actions .mcp-server-manage-link a {
@@ -602,7 +680,7 @@
   flex: 1;
   padding: 32px;
   background-color: #000;
-  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.08) 1px, transparent 0);
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.12) 1px, transparent 0);
   background-size: 20px 20px;
   min-height: 0;
   overflow-y: auto;
@@ -627,10 +705,236 @@
 }
 
 .flow-canvas-bottom-controls {
-  position: absolute;
+  position: fixed;
   bottom: 8px;
-  left: 8px;
   z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.flow-canvas-bottom-controls.logs-open {
+  bottom: 308px; /* 300px logs height + 8px margin */
+}
+
+/* Logs Container - Morphs from button to panel */
+.logs-container {
+  position: relative;
+  background: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 6px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Inter', sans-serif;
+  z-index: 1000;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Collapsed state (button) */
+.logs-container:not(.expanded) {
+  width: auto;
+  height: auto;
+  cursor: pointer;
+}
+
+.logs-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.logs-container:not(.expanded):hover .logs-button {
+  background: #27272a;
+}
+
+.logs-container:not(.expanded):hover {
+  border-color: #3f3f46;
+}
+
+/* Expanded state (panel) */
+.logs-container.expanded {
+  width: 100%;
+  height: 300px;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  animation: expandToPanel 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes expandToPanel {
+  0% {
+    width: auto;
+    height: auto;
+    border-radius: 6px;
+  }
+  100% {
+    width: 100%;
+    height: 300px;
+    border-radius: 8px 8px 0 0;
+  }
+}
+
+.logs-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px 12px 0;
+  border-bottom: 1px solid #27272a;
+  background: #18181b;
+}
+
+.logs-tab-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #18181b;
+  color: #fff;
+  border: 1px solid #27272a;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  top: 1px;
+  z-index: 1;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logs-tab-button:hover {
+  background: #27272a;
+  border-color: #3f3f46;
+  transform: translateY(-1px);
+  box-shadow: 0 -3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.logs-tab-button .logs-count {
+  color: #a1a1aa;
+  font-size: 12px;
+  font-weight: 500;
+  background: #3f3f46;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 16px;
+  text-align: center;
+}
+
+.logs-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logs-clear-btn {
+  background: none;
+  border: 1px solid #3f3f46;
+  color: #a1a1aa;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logs-clear-btn:hover {
+  background: #27272a;
+  color: #fff;
+}
+
+.logs-close-btn {
+  background: none;
+  border: none;
+  color: #71717a;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.logs-close-btn:hover {
+  color: #fff;
+  background: #27272a;
+}
+
+.logs-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+.logs-table {
+  height: 100%;
+  overflow-y: auto;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.log-entry {
+  display: grid;
+  grid-template-columns: 100px 70px 120px 1fr;
+  gap: 16px;
+  padding: 6px 16px;
+  border-bottom: 1px solid #27272a;
+  align-items: center;
+  transition: background-color 0.1s;
+}
+
+.log-entry:hover {
+  background: #1a1a1d;
+}
+
+.log-timestamp {
+  font-size: 11px;
+  color: #71717a;
+  font-weight: 400;
+}
+
+.log-level {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.log-source {
+  font-size: 12px;
+  color: #a1a1aa;
+  font-weight: 500;
+}
+
+.log-message {
+  font-size: 12px;
+  color: #e4e4e7;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Custom scrollbar for logs */
+.logs-table::-webkit-scrollbar {
+  width: 8px;
+}
+
+.logs-table::-webkit-scrollbar-track {
+  background: #1a1a1d;
+}
+
+.logs-table::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 4px;
+}
+
+.logs-table::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
 }
 
 .flow-canvas-bottom-controls .flow-canvas-btn {
@@ -651,6 +955,72 @@
 }
 
 .flow-canvas-bottom-controls .flow-canvas-btn:hover {
+  background: #27272a;
+  border-color: #3f3f46;
+}
+
+.flow-canvas-bottom-controls .flow-canvas-btn.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+/* Zoom Controls */
+.zoom-controls-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.zoom-control-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.zoom-hover-controls {
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  pointer-events: none;
+}
+
+.zoom-control-group:hover .zoom-hover-controls {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.zoom-hover-controls .flow-canvas-btn {
+  padding: 8px;
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+}
+
+/* Single icon buttons should be square */
+.flow-canvas-btn.zoom-btn,
+.flow-canvas-btn.fit-screen-btn {
+  padding: 8px;
+  width: 40px;
+  height: 40px;
+  justify-content: center;
+  background: #18181b;
+  color: #fff;
+  border-color: #27272a;
+}
+
+.flow-canvas-btn.zoom-btn:hover,
+.flow-canvas-btn.fit-screen-btn:hover {
   background: #27272a;
   border-color: #3f3f46;
 }
@@ -732,9 +1102,6 @@
 }
 
 .flow-canvas-help-btn {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
   background: #18181b;
   color: #fff;
   border: 1px solid #27272a;
@@ -747,13 +1114,79 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  z-index: 1000;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .flow-canvas-help-btn:hover {
   background: #27272a;
   border-color: #3f3f46;
+}
+
+.flow-canvas-help-btn.active {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.help-menu-container {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1001;
+}
+
+.help-menu-container.logs-open {
+  bottom: 308px; /* 300px logs height + 8px margin */
+}
+
+.help-menu {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 12px; /* Increased spacing from button */
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 240px;
+  z-index: 1002; /* Higher than container */
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  transform: translateY(0); /* Ensure proper positioning */
+}
+
+.help-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #e5e5e5;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 400;
+  transition: background-color 0.2s;
+  position: relative;
+}
+
+.help-menu-item:hover {
+  background: #2a2a2a;
+}
+
+.help-menu-item:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.help-menu-item:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.help-menu-external {
+  margin-left: auto;
+  color: #a1a1aa;
 }
 
 .help-btn {

@@ -1,10 +1,11 @@
 import React from 'react';
-import { Edit, Code, Settings, MoreHorizontal } from 'lucide-react';
+import { Code, Settings, MoreHorizontal, Zap } from 'lucide-react';
 import './ContextualToolbar.css';
 
 export default function ContextualToolbar({ 
   position, 
-  onEditServer, 
+  onToolMode, 
+  isToolModeEnabled = false,
   onCode, 
   onControls, 
   onMore 
@@ -18,12 +19,12 @@ export default function ContextualToolbar({
       }}
     >
       <button 
-        className="toolbar-btn"
-        onClick={onEditServer}
-        title="Edit Server"
+        className={`toolbar-btn ${isToolModeEnabled ? 'toolbar-btn-active' : ''}`}
+        onClick={onToolMode}
+        title="Tool Mode"
       >
-        <Edit size={14} />
-        <span>Edit Server</span>
+        <Zap size={14} />
+        <span>Tool Mode</span>
       </button>
       
       <div className="toolbar-separator" />

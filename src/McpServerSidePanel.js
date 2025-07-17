@@ -1,15 +1,23 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { X, MoreHorizontal, Info, Edit, Share2, GitBranch, Zap, Trash2, AlertTriangle } from 'lucide-react';
+import { X, MoreHorizontal, Info, Edit, Share2, GitBranch, Zap, Trash2, AlertTriangle, Key } from 'lucide-react';
 import './McpServerSidePanel.css';
-import AddToolsDialog from './AddToolsDialog';
 
-export default function McpServerSidePanel({ serverData, onClose, onEdit, onDelete, isOpen = true, onWidthChange }) {
-  const [isRunning, setIsRunning] = useState(true);
-  const [authType, setAuthType] = useState('none');
+export default function McpServerSidePanel({ serverData, onClose, onEdit, onDelete, isOpen = true, onWidthChange, onOpenAddTools }) {
+  const [isRunning, setIsRunning] = useState(serverData?.status === 'online');
+  const [authType, setAuthType] = useState(serverData?.authType || 'none');
   const [showActionsMenu, setShowActionsMenu] = useState(false);
   const [showAuthDropdown, setShowAuthDropdown] = useState(false);
-  const [serverName, setServerName] = useState(serverData?.name || 'Figmail');
+  const [serverName, setServerName] = useState(serverData?.name || 'Server');
   const [panelWidth, setPanelWidth] = useState(400);
+
+  // Update state when serverData changes
+  React.useEffect(() => {
+    if (serverData) {
+      setServerName(serverData.name || 'Server');
+      setIsRunning(serverData.status === 'online');
+      setAuthType(serverData.authType || 'none');
+    }
+  }, [serverData]);
 
   // Notify parent of width changes
   React.useEffect(() => {
@@ -25,7 +33,7 @@ export default function McpServerSidePanel({ serverData, onClose, onEdit, onDele
   const [pendingAuthType, setPendingAuthType] = useState(null);
   
   // Add Tools dialog state
-  const [showAddToolsDialog, setShowAddToolsDialog] = useState(false);
+
   
   // Authentication field states
   const [apiKeyHeader, setApiKeyHeader] = useState('');
@@ -41,16 +49,8 @@ export default function McpServerSidePanel({ serverData, onClose, onEdit, onDele
   const authDropdownRef = useRef();
   const panelRef = useRef();
 
-  const tools = [
-    'GMAIL_CREATE_EMAIL_DRAFT',
-    'GMAIL_CREATE_LABEL', 
-    'GMAIL_FETCH_EMAILS',
-    'GMAIL_GET_CONTACTS',
-    'GMAIL_GET_PROFILE',
-    'GMAIL_LIST_LABELS'
-  ];
-
-  const toolCount = tools.length;
+  const tools = serverData?.toolList || [];
+  const toolCount = serverData?.tools || tools.length;
   const isToolsOverTooled = toolCount > 12;
 
   const authOptions = [
@@ -132,20 +132,7 @@ export default function McpServerSidePanel({ serverData, onClose, onEdit, onDele
     setPendingAuthType(null);
   };
 
-  const handleAddTools = () => {
-    setShowAddToolsDialog(true);
-  };
 
-  const handleCloseAddTools = () => {
-    setShowAddToolsDialog(false);
-  };
-
-  const handleSaveTools = (selectedTools, toolConfig) => {
-    // TODO: Implement tool saving logic
-    console.log('Selected tools:', selectedTools);
-    console.log('Tool config:', toolConfig);
-    setShowAddToolsDialog(false);
-  };
 
   const handleResizeStart = (e) => {
     setIsResizing(true);
@@ -388,6 +375,7 @@ export default function McpServerSidePanel({ serverData, onClose, onEdit, onDele
             </div>
           )}
         </div>
+        <div className="side-panel-tabs-divider"></div>
 
         <div className="side-panel-content">
           <div className="side-panel-section">
@@ -396,12 +384,17 @@ export default function McpServerSidePanel({ serverData, onClose, onEdit, onDele
               <Info size={14} className="side-panel-info-icon" />
             </label>
             <div className="server-name-row">
-              <input
-                type="text"
-                className="side-panel-input"
-                value={serverName}
-                onChange={(e) => setServerName(e.target.value)}
-              />
+              <div className="server-name-input-container">
+                <input
+                  type="text"
+                  className="side-panel-input"
+                  value={serverName}
+                  onChange={(e) => setServerName(e.target.value)}
+                />
+                {authType && authType !== 'none' && (
+                  <Key size={12} className="auth-key-icon-sidebar" title={`Authentication: ${authType}`} />
+                )}
+              </div>
               <button 
                 className="edit-server-btn"
                 onClick={() => handleActionSelect('edit')}
@@ -411,6 +404,15 @@ export default function McpServerSidePanel({ serverData, onClose, onEdit, onDele
               </button>
             </div>
           </div>
+
+          {serverData?.warning && (
+            <div className="side-panel-section warning-section">
+              <div className="warning-banner">
+                <AlertTriangle size={16} className="warning-icon" />
+                <span className="warning-text">{serverData.warning}</span>
+              </div>
+            </div>
+          )}
 
           <div className="side-panel-section">
             <label className="side-panel-label">
@@ -479,7 +481,7 @@ export default function McpServerSidePanel({ serverData, onClose, onEdit, onDele
                   <AlertTriangle size={14} className="tools-warning-icon" title="Over-tooled server" />
                 )}
               </div>
-              <button className="add-tools-btn" onClick={handleAddTools}>+</button>
+                              <button className="add-tools-btn" onClick={onOpenAddTools}>+</button>
             </div>
             <div className={`tools-list ${isToolsOverTooled ? 'over-tooled' : ''}`}>
               {tools.map((tool, index) => (
@@ -533,13 +535,7 @@ export default function McpServerSidePanel({ serverData, onClose, onEdit, onDele
            </div>
          )}
 
-         {/* Add Tools dialog */}
-         {showAddToolsDialog && (
-           <AddToolsDialog 
-             onClose={handleCloseAddTools}
-             onSave={handleSaveTools}
-           />
-         )}
+
       </div>
   );
 } 

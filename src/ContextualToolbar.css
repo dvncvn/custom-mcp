@@ -37,6 +37,16 @@
   background: #3f3f46;
 }
 
+.toolbar-btn-active {
+  background: #2563eb;
+  color: #fff;
+}
+
+.toolbar-btn-active:hover {
+  background: #1d4ed8;
+  color: #fff;
+}
+
 .toolbar-btn-icon {
   padding: 8px;
   gap: 0;

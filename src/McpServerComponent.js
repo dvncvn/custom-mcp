@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Settings, X, MoreHorizontal } from 'lucide-react';
+import { ChevronDown, Settings, X, MoreHorizontal, Edit } from 'lucide-react';
 import { McpIcon } from './icons';
 import './McpServerComponent.css';
 
@@ -11,7 +11,8 @@ export default function McpServerComponent({
   onRemove,
   onPositionChange,
   isSelected = false,
-  onSelect
+  onSelect,
+  onEditServer
 }) {
   const [showServerDropdown, setShowServerDropdown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -133,20 +134,21 @@ export default function McpServerComponent({
       <div className="component-content">
         <div className="component-field">
           <label className="component-label">Server</label>
-          <div className="server-dropdown-container" ref={dropdownRef}>
-            <button 
-              className="server-dropdown-button"
-              onClick={() => setShowServerDropdown(!showServerDropdown)}
-            >
-              <span className="server-name">{selectedServer?.name || 'Select Server'}</span>
-              {selectedServer?.type === 'custom' && (
-                <span className="server-badge">Custom</span>
-              )}
-              <ChevronDown 
-                size={16} 
-                className={`dropdown-arrow ${showServerDropdown ? 'open' : ''}`}
-              />
-            </button>
+          <div className="server-field-row">
+            <div className="server-dropdown-container" ref={dropdownRef}>
+              <button 
+                className="server-dropdown-button"
+                onClick={() => setShowServerDropdown(!showServerDropdown)}
+              >
+                <span className="server-name">{selectedServer?.name || 'Select Server'}</span>
+                {selectedServer?.type === 'custom' && (
+                  <span className="server-badge">Custom</span>
+                )}
+                <ChevronDown 
+                  size={16} 
+                  className={`dropdown-arrow ${showServerDropdown ? 'open' : ''}`}
+                />
+              </button>
             
             {showServerDropdown && (
               <div className="server-dropdown">
@@ -172,6 +174,20 @@ export default function McpServerComponent({
                   </div>
                 ))}
               </div>
+            )}
+            </div>
+            
+            {selectedServer && onEditServer && (
+              <button 
+                className="edit-server-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditServer();
+                }}
+                title="Edit Server"
+              >
+                <Edit size={14} />
+              </button>
             )}
           </div>
         </div>
